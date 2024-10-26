@@ -1,0 +1,119 @@
+<launch>
+    <arg name="cam1_name" default="cam0"/>
+    <arg name="cam2_name" default="cam1"/>
+    <arg name="cam3_name" default="cam2"/>
+
+    <arg name="transform_file" default="$(find cps_proj_pkg)/config/extrinsics.yaml"/>
+    <arg name="pub_rate" default="100"/>
+
+    <group ns="alphasense_driver_ros/$(arg cam1_name)">
+        <node pkg="cps_proj_pkg" type="camera_info_publisher_node.py" name="camera_info_publisher" output="screen">
+            <param name="camera_info_file" value="$(find cps_proj_pkg)/config/$(arg cam1_name).yaml"/>
+            <param name="frame_id" value="$(arg cam1_name)_optical_frame"/>
+            <param name="rate" value="$(arg pub_rate)"/>
+            <remap from="camera_info" to="camera_info"/>
+        </node>
+    </group>
+
+    <group ns="alphasense_driver_ros/$(arg cam2_name)">
+        <node pkg="cps_proj_pkg" type="camera_info_publisher_node.py" name="camera_info_publisher" output="screen">
+            <param name="camera_info_file" value="$(find cps_proj_pkg)/config/$(arg cam2_name).yaml"/>
+            <param name="frame_id" value="$(arg cam2_name)_sensor_frame"/>
+            <param name="rate" value="$(arg pub_rate)"/>
+            <remap from="camera_info" to="camera_info"/>
+        </node>
+    </group>
+
+    <group ns="alphasense_driver_ros/$(arg cam3_name)">
+        <node pkg="cps_proj_pkg" type="camera_info_publisher_node.py" name="camera_info_publisher" output="screen">
+            <param name="camera_info_file" value="$(find cps_proj_pkg)/config/$(arg cam3_name).yaml"/>
+            <param name="frame_id" value="$(arg cam3_name)_sensor_frame"/>
+            <param name="rate" value="$(arg pub_rate)"/>
+            <remap from="camera_info" to="camera_info"/>
+        </node>
+    </group>
+
+    <node pkg="cps_proj_pkg" type="anymal_transform_publisher.py" name="anymal_transform_publisher" output="screen">
+        <param name="transform_file" value="$(arg transform_file)"/>
+        <param name="rate" value="$(arg pub_rate)"/>
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="lidar_nodelet_manager"
+          args="manager" output="screen"/>
+
+    <arg name="model" default="VLP16" />
+    <arg name="min_range" default="0.3" />
+    <arg name="max_range" default="130.0" />
+    <arg name="calibration" default="$(find velodyne_pointcloud)/params/VLP16db.yaml" />
+    <arg name="fixed_frame" default="lidar" />
+    <arg name="target_frame" default="lidar" />
+
+    <arg name="manager" default="lidar_nodelet_manager" />
+
+    <arg name="organize_cloud" default="false" />
+    <node pkg="nodelet" type="nodelet" name="$(arg manager)_transform"
+        args="load velodyne_pointcloud/TransformNodelet $(arg manager)" >
+        <param name="model" value="$(arg model)"/>
+        <param name="calibration" value="$(arg calibration)"/>
+        <param name="fixed_frame" value="$(arg fixed_frame)"/>
+        <param name="target_frame" value="$(arg target_frame)"/>
+        <param name="max_range" value="$(arg max_range)"/>
+        <param name="min_range" value="$(arg min_range)"/>
+        <param name="organize_cloud" value="$(arg organize_cloud)"/>
+        <remap from="/velodyne_packets" to="/lidar/packets"/>
+    </node>
+
+    <node name="republish_cam0" type="republish" pkg="image_transport" output="screen"
+          args="compressed in:=/alphasense_driver_ros/cam0 raw out:=/alphasense_driver_ros/cam0/image_raw" />
+    <node name="republish_cam1" type="republish" pkg="image_transport" output="screen"
+          args="compressed in:=/alphasense_driver_ros/cam1 raw out:=/alphasense_driver_ros/cam1/image_raw" />
+    <node name="republish_cam2" type="republish" pkg="image_transport" output="screen"
+          args="compressed in:=/alphasense_driver_ros/cam2 raw out:=/alphasense_driver_ros/cam2/image_raw" />
+
+    <node ns="alphasense_driver_ros/cam0" pkg="image_proc" type="image_proc" name="image_proc_cam0">
+        <remap from="image_raw" to="image_raw"/>
+        <remap from="camera_info" to="camera_info"/>
+        <param name="queue_size" value="10"/>
+    </node>
+
+    <node ns="alphasense_driver_ros/cam1" pkg="image_proc" type="image_proc" name="image_proc_cam1">
+        <remap from="image_raw" to="image_raw"/>
+        <remap from="camera_info" to="camera_info"/>
+        <param name="queue_size" value="10"/>
+    </node>
+
+    <node ns="alphasense_driver_ros/cam2" pkg="image_proc" type="image_proc" name="image_proc_cam2">
+        <remap from="image_raw" to="image_raw"/>
+        <remap from="camera_info" to="camera_info"/>
+        <param name="queue_size" value="10"/>
+    </node>
+
+    <arg name="image_topic" default="alphasense_driver_ros/cam0/image_rect"/>
+    <arg name="depth_topic" default="alphasense_driver_ros/cam0/depth"/>
+    <arg name="frame_id" default="cam0_sensor_frame"/>
+
+    <node pkg="cps_proj_pkg" type="depth_estimation_node.py" name="depth_estimator" output="screen">
+        <param name="image_topic" value="$(arg image_topic)"/>
+        <param name="depth_topic" value="$(arg depth_topic)"/>
+        <param name="frame_id" value="$(arg frame_id)"/>
+        <param name="model_path" value="$(find cps_proj_pkg)/scripts/depth_anything_v2_metric_hypersim_vits.pth"/>
+    </node>
+
+    <arg name="depth_image_topic" default="alphasense_driver_ros/cam0/depth"/>
+    <arg name="camera_info_topic" default="alphasense_driver_ros/cam0/camera_info"/>
+    <arg name="point_cloud_topic" default="alphasense_driver_ros/cam0/points"/>
+
+    <node pkg="cps_proj_pkg" type="depth_image_to_point_cloud_node" name="depth_image_to_point_cloud" output="screen">
+        <remap from="depth_image" to="$(arg depth_image_topic)"/>
+        <remap from="camera_info" to="$(arg camera_info_topic)"/>
+        <remap from="point_cloud" to="$(arg point_cloud_topic)"/>
+
+        <param name="camera_frame" value="cam0_sensor_frame"/>
+        <param name="target_frame" value="cam0_sensor_frame"/>
+
+        <param name="min_depth" value="0.1"/>  <!-- Minimum depth in meters -->
+        <param name="max_depth" value="20.0"/> <!-- Maximum depth in meters -->
+        <param name="queue_size" value="1"/>   <!-- Queue size for subscribers/publishers -->
+    </node>
+
+</launch>

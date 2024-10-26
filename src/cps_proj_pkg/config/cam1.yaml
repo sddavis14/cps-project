@@ -1,0 +1,20 @@
+image_width: 720
+image_height: 540
+camera_name: cam1_sensor_frame
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [350.8937182093, 0.0, 353.1049229165, 0.0, 350.6949700132, 265.178187102, 0.0, 0.0, 1.0]
+distortion_model: equidistant
+distortion_coefficients:
+  rows: 1
+  cols: 4
+  data: [-0.0436337962, 0.006702276, -0.0065897614, 0.0015173216]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [350.8937182093, 0.0, 353.1049229165, 0.0, 0.0, 350.6949700132, 265.178187102, 0.0, 0.0, 0.0, 1.0, 0.0]

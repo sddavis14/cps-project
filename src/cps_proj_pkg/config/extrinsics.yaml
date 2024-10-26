@@ -1,0 +1,86 @@
+# Convention: source_to_destination has same meaning as executing `rosrun tf_echo source_frame target_frame`
+
+## Robot's IMU to LiDAR
+imu_link_to_lidar:
+  pose:
+    x: -0.007288
+    y: 0.614149
+    z: 0.086959
+    roll: 0.014782
+    pith: -0.013844
+    yaw: -3.141363
+
+
+## Alphasense's IMU
+lidar_to_imu_sensor_frame:
+  pose:
+    x:  0.00432374
+    y:  0.037466
+    z:  0.063319
+    roll: 0.0
+    pitch: 0.0
+    yaw:   0.0261799562120955
+
+## Alphasense's cameras
+imu_sensor_frame_to_cam0_sensor_frame:
+  pose:
+    x:  0.0471397497
+    y:  -0.0778675546
+    z:  0.0260845632
+    roll:  -1.57042931203478
+    pitch: -0.00053174932506
+    yaw:   -3.13892416274554
+
+imu_sensor_frame_to_cam1_sensor_frame:
+  pose:
+    x:  -0.0522293835
+    y:  -0.0794076751
+    z:  0.024301567
+    roll:  -1.5718996812831
+    pitch: 0.001097383320221
+    yaw:   -3.13755772591186
+
+imu_sensor_frame_to_cam2_sensor_frame:
+  pose:
+    x:  0.0436029277
+    y:  -0.0563803407
+    z:  0.0665592907
+    roll:  0.00016216876942
+    pitch: 0.00264836569579
+    yaw:   3.13677774480024
+
+imu_sensor_frame_to_cam3_sensor_frame:
+  pose:
+    x:  0.0697997244
+    y:  -0.0246240562
+    z:  0.0320369225
+    roll:  -1.39769692134863
+    pitch: -0.004412135915184
+    yaw:   -1.57103477861812
+
+imu_sensor_frame_to_cam4_sensor_frame:
+  pose:
+    x:  -0.0027418457
+    y:  -0.080574754
+    z:  0.0254308651
+    roll:  -1.56722636685879
+    pitch: 0.000292791904189
+    yaw:   -3.14084496968807
+
+imu_sensor_frame_to_cam5_sensor_frame:
+  pose:
+    x:  -0.0763249485
+    y:  -0.0231657831
+    z:  0.0324845002
+    roll:  -1.39649598390354
+    pitch: -0.00082845999478
+    yaw:   1.57029972190405
+
+imu_sensor_frame_to_cam6_sensor_frame:
+  pose:
+    x:  -0.0547974668
+    y:  -0.0565807566
+    z:  0.067153945
+    roll:  -0.00000200380024
+    pitch: -0.00049940912076
+    yaw:   3.13543126753762
